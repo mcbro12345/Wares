@@ -1,0 +1,16 @@
+{
+  "Author": "mcbro",
+  "Name": "Wares",
+  "InternalName": "Wares",
+  "AssemblyVersion": "0.1.0.0",
+  "Description": "Mark inventory items as vendor wares or market listings with native badges, multi-select with Ctrl+click, and sell every marked ware in one click at vendors and retainers.",
+  "ApplicableVersion": "any",
+  "Tags": ["inventory", "vendor", "sell", "market", "junk"],
+  "DalamudApiLevel": 15,
+  "LoadRequiredState": 0,
+  "LoadSync": false,
+  "CanUnloadAsync": false,
+  "LoadPriority": 0,
+  "IconUrl": "https://raw.githubusercontent.com/mcbro12345/Wares/main/images/icon.png",
+  "Punchline": "Mark it, sell it"
+}
