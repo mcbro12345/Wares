@@ -12,7 +12,7 @@ A Dalamud plugin for FFXIV that lets you mark inventory items as **Wares** (vend
 - **Movable button.** Settings has an X / Y drag control for each inventory layout to line the button up, live, with a preview toggle so you can do it away from a vendor.
 - Works with the normal, larger and "open all bags" inventory layouts, including sorted inventories. Key items and crystals are never touched.
 
-Marks are saved per character and per item (NQ and HQ separately), so an item stays marked the next time you pick it up. To mark an item, right-click it and choose **Mark for Wares** / **Mark for Market** (or **Unmark ...**). This is an optional feature and can be toggled off to make marks per just the item in your inventory.
+Marks are saved per character and apply to the stack you marked: they follow it when you move it, and are gone once it's sold or used up. To mark an item, right-click it and choose **Mark for Wares** / **Mark for Market** (or **Unmark ...**). Turn on **Remember marks for every copy of an item** in the settings to have a mark cover every copy of that item (NQ and HQ separately), including ones you pick up later.
 
 ## Commands
 

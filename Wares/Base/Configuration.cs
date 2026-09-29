@@ -35,7 +35,7 @@ public sealed class Configuration : IPluginConfiguration
 {
     private const int CurrentVersion = 1;
 
-    public const float DefaultSellButtonWidth = 130.0f;
+    public const float DefaultSellButtonWidth = 123.0f;
 
     public int Version { get; set; } = CurrentVersion;
 
@@ -44,7 +44,7 @@ public sealed class Configuration : IPluginConfiguration
     // Marks
     // On: a mark applies to every copy of the item, now and later. Off: it
     // applies only to the stack that was marked.
-    public bool RememberMarksByItem { get; set; } = true;
+    public bool RememberMarksByItem { get; set; }
 
     // Inventory display
     public bool ShowBadges { get; set; } = true;
@@ -53,7 +53,7 @@ public sealed class Configuration : IPluginConfiguration
     // Selling
     public bool AutoConfirmPrompts { get; set; } = true;
     public bool SellAtRetainer { get; set; } = true;
-    public int SellIntervalMs { get; set; } = 250;
+    public int SellIntervalMs { get; set; } = 100;
     public bool PrintSellSummary { get; set; } = true;
 
     // Sell button placement, one offset per inventory layout (keyed by the

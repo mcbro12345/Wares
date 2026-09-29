@@ -51,6 +51,14 @@ internal sealed unsafe class SellButton : IDisposable
     // bottom-left corner, clear of the window frame.
     public static Vector2 DefaultOffset(string layout)
     {
+        switch (layout)
+        {
+            case "Inventory":
+            case "InventoryLarge":
+                return new Vector2(16.0f, 396.0f);
+            case "InventoryExpansion":
+                return new Vector2(16.0f, 724.0f);
+        }
         var addon = GameAddons.Get(layout);
         float height = addon != null && addon->RootNode != null ? addon->RootNode->Height : 400.0f;
         return new Vector2(16.0f, MathF.Max(0.0f, height - Height - 12.0f));
