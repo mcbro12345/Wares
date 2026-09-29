@@ -9,10 +9,10 @@ A Dalamud plugin for FFXIV that lets you mark inventory items as **Wares** (vend
 - **One mark per item.** Marking an item for Wares removes its Market mark and vice versa.
 - **Ctrl+click multi-select.** Ctrl+left-click cells to select several items (they light up like a hovered cell), then right-click one of them to mark, re-mark or clear them all at once. Items that can't take a mark are skipped. Clicking anywhere else clears the selection, like File Explorer.
 - **Sell Wares button.** While you're talking to a vendor (or have a retainer's inventory open), a native **Sell Wares (N)** button appears in the inventory. It sells every Wares-marked item one by one and answers the game's confirmation prompts (unique, untradable, HQ, melded items) for you. Click it again to stop.
-- **Movable button.** Settings has a Chat 2-style X / Y drag control for each inventory layout to line the button up, live, with a preview toggle so you can do it away from a vendor.
+- **Movable button.** Settings has an X / Y drag control for each inventory layout to line the button up, live, with a preview toggle so you can do it away from a vendor.
 - Works with the normal, larger and "open all bags" inventory layouts, including sorted inventories. Key items and crystals are never touched.
 
-Marks are saved per character and per item (NQ and HQ separately), so an item stays marked the next time you pick it up. To mark an item, right-click it and choose **Mark for Wares** / **Mark for Market** (or **Unmark ...**).
+Marks are saved per character and per item (NQ and HQ separately), so an item stays marked the next time you pick it up. To mark an item, right-click it and choose **Mark for Wares** / **Mark for Market** (or **Unmark ...**). This is an optional feature and can be toggled off to make marks per just the item in your inventory.
 
 ## Commands
 
