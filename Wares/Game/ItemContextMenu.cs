@@ -157,7 +157,12 @@ internal sealed unsafe class ItemContextMenu : IDisposable
         // Location...) to any menu opened over a hovered item. This menu is
         // about the selection, not one item, so it's opened with none hovered.
         Services.GameGui.HoveredItem = 0;
-        selectionMenu.Open();
+
+        // The menu is opened for the inventory window. Opened with no owner,
+        // the game reuses whichever window last had a context menu, and the
+        // menu never shows if that window has since closed.
+        var owner = GameAddons.VisibleInventoryLayout();
+        selectionMenu.Open(owner != null ? owner->Id : 0u);
     }
 
     private void AddSelectionItem(string name, bool enabled, int priority, Action onClick)

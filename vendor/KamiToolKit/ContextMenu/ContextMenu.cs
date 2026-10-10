@@ -60,7 +60,11 @@ public unsafe class ContextMenu : IDisposable {
     /// <summary>
     /// Opens a menu with the currently configured context menu entries.
     /// </summary>
-    public void Open() {
+    /// <param name="ownerAddonId">
+    /// Wares addition (not upstream): the addon the menu belongs to. Without one the game reuses whichever
+    /// addon last owned a context menu, and the menu fails to show if that addon has since closed.
+    /// </param>
+    public void Open(uint ownerAddonId = 0) {
         var agentContextMenu = AgentContext.Instance();
 
         agentContextMenu->ClearMenu();
@@ -80,7 +84,12 @@ public unsafe class ContextMenu : IDisposable {
             }
         }
 
-        agentContextMenu->OpenContextMenu();
+        if (ownerAddonId != 0) {
+            agentContextMenu->OpenContextMenuForAddon(ownerAddonId);
+        }
+        else {
+            agentContextMenu->OpenContextMenu();
+        }
     }
 
     /// <summary>
