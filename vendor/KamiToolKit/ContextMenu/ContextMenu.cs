@@ -153,31 +153,36 @@ public unsafe class ContextMenu : IDisposable {
                 ClearAll();
             }
 
-            returnValue->SetBool(true);
-            return returnValue;
+            return ReturnTrue(returnValue);
         }
 
         if (mainMenuSubMenus.TryGetValue(handlerParam, out var subMenuItem)) {
             OpenSubMenu(subMenuItem);
 
-            returnValue->SetBool(true);
-            return returnValue;
+            return ReturnTrue(returnValue);
         }
 
         if (mainMenuEntries.TryGetValue(handlerParam, out var item)) {
             item.OnClick();
             ClearAll();
 
-            returnValue->SetBool(true);
-            return returnValue;
+            return ReturnTrue(returnValue);
         }
 
         subMenuEntries.Clear();
 
-        returnValue->SetBool(true);
-        return returnValue;
+        return ReturnTrue(returnValue);
     }
 
+    // The return slot belongs to the game's caller, so nothing in it is ours to free. AtkValue.SetBool frees the
+    // string the slot already holds before writing, and when that string had already been freed it corrupted the
+    // heap and crashed the game as a right-click menu entry was picked (Wares addition, not upstream). The result
+    // is written straight into the slot instead, which is all SetBool does after that release.
+    private static AtkValue* ReturnTrue(AtkValue* returnValue) {
+        returnValue->Type = AtkValueType.Bool;
+        returnValue->Bool = true;
+        return returnValue;
+    }
     private readonly CustomEventInterface contextMenuEventInterface;
 
     private Dictionary<long, ContextMenuItem> mainMenuEntries = [];

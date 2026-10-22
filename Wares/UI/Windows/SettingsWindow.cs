@@ -18,11 +18,11 @@ public sealed class SettingsWindow : Window
     ];
 
     private readonly Configuration configuration;
-    private readonly Func<(int Wares, int Market)> markCounts;
+    private readonly Func<(int Wares, int Market, int Seals)> markCounts;
     private readonly Action clearMarks;
     private bool confirmingClear;
 
-    internal SettingsWindow(Configuration configuration, Func<(int Wares, int Market)> markCounts, Action clearMarks)
+    internal SettingsWindow(Configuration configuration, Func<(int Wares, int Market, int Seals)> markCounts, Action clearMarks)
         : base("Wares Settings###WaresSettings")
     {
         this.configuration = configuration;
@@ -46,7 +46,7 @@ public sealed class SettingsWindow : Window
     public override void Draw()
     {
         Section("INVENTORY");
-        Toggle("Show Wares and Market badges on items", configuration.ShowBadges, v => configuration.ShowBadges = v);
+        Toggle("Show Wares, Market and Seals badges on items", configuration.ShowBadges, v => configuration.ShowBadges = v);
         Toggle("Ctrl+click to select several items", configuration.EnableMultiSelect, v => configuration.EnableMultiSelect = v,
             "Ctrl+left-click items to select them, then right-click one of them to mark them all. Clicking anywhere else clears the selection.");
 
@@ -113,11 +113,11 @@ public sealed class SettingsWindow : Window
 
     private void DrawMarks()
     {
-        var (wares, market) = markCounts();
-        ImGui.TextUnformatted($"This character has {wares} item{(wares == 1 ? "" : "s")} marked for Wares and {market} for Market.");
+        var (wares, market, seals) = markCounts();
+        ImGui.TextUnformatted($"This character has {wares} item{(wares == 1 ? "" : "s")} marked for Wares, {market} for Market and {seals} for Seals.");
         if (!confirmingClear)
         {
-            ImGui.BeginDisabled(wares + market == 0);
+            ImGui.BeginDisabled(wares + market + seals == 0);
             if (ImGui.Button("Clear all marks")) confirmingClear = true;
             ImGui.EndDisabled();
             return;

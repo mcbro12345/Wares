@@ -17,6 +17,10 @@ internal static unsafe class ItemRules
 
     private static ExcelSheet<Item> Items => itemSheet ??= Services.DataManager.GetExcelSheet<Item>();
 
+    private static ExcelSheet<GCSupplyDutyReward>? sealSheet;
+
+    private static ExcelSheet<GCSupplyDutyReward> SealRewards => sealSheet ??= Services.DataManager.GetExcelSheet<GCSupplyDutyReward>();
+
     public static Item? Row(InventoryItem* item)
         => item == null ? null : Items.GetRowOrDefault(item->GetBaseItemId());
 
@@ -50,10 +54,21 @@ internal static unsafe class ItemRules
             && item->GetGlamourId() == 0;
     }
 
+    // Expert Delivery takes gear that can be discarded and pays seals by item level; the game's reward table has a
+    // row per item level, so an item level with no seals in it can't be turned in either.
+    public static bool CanSellForSeals(InventoryItem* item)
+    {
+        if (Row(item) is not { } row) return false;
+        return row.EquipSlotCategory.RowId != 0
+            && !row.IsIndisposable
+            && SealRewards.GetRowOrDefault(row.LevelItem.RowId)?.SealsExpertDelivery > 0;
+    }
+
     public static bool CanMark(InventoryItem* item, MarkKind kind) => kind switch
     {
         MarkKind.Wares => CanSellToVendor(item),
         MarkKind.Market => CanListOnMarket(item),
+        MarkKind.Seals => CanSellForSeals(item),
         _ => true,
     };
 }

@@ -18,6 +18,7 @@ internal sealed unsafe class DragBadge : IDisposable
 {
     private readonly TextNode gilBadge = InventoryOverlay.CreateBadge(SeIconChar.Gil.ToIconString(), InventoryOverlay.GilColor, InventoryOverlay.GilOutline);
     private readonly TextNode marketBadge = InventoryOverlay.CreateBadge("M", InventoryOverlay.MarketColor, InventoryOverlay.MarketOutline);
+    private readonly TextNode sealsBadge = InventoryOverlay.CreateBadge("S", InventoryOverlay.SealsColor, InventoryOverlay.SealsOutline);
     private AtkResNode* attachedTo;
 
     public void Dispose()
@@ -25,6 +26,7 @@ internal sealed unsafe class DragBadge : IDisposable
         Detach();
         gilBadge.Dispose();
         marketBadge.Dispose();
+        sealsBadge.Dispose();
     }
 
     // kind: the mark on the item being dragged out of a bag cell, or None.
@@ -52,6 +54,7 @@ internal sealed unsafe class DragBadge : IDisposable
 
         gilBadge.IsVisible = kind == MarkKind.Wares;
         marketBadge.IsVisible = kind == MarkKind.Market;
+        sealsBadge.IsVisible = kind == MarkKind.Seals;
     }
 
     private void Attach(AtkResNode* node)
@@ -61,8 +64,10 @@ internal sealed unsafe class DragBadge : IDisposable
         var position = new Vector2(width - 19.0f, 2.0f);
         gilBadge.Position = position;
         marketBadge.Position = position;
+        sealsBadge.Position = position;
         gilBadge.AttachNode(node);
         marketBadge.AttachNode(node);
+        sealsBadge.AttachNode(node);
         attachedTo = node;
     }
 
@@ -71,8 +76,10 @@ internal sealed unsafe class DragBadge : IDisposable
         if (attachedTo == null) return;
         gilBadge.IsVisible = false;
         marketBadge.IsVisible = false;
+        sealsBadge.IsVisible = false;
         gilBadge.DetachNode();
         marketBadge.DetachNode();
+        sealsBadge.DetachNode();
         attachedTo = null;
     }
 

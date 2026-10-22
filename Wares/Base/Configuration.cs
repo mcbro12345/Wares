@@ -9,6 +9,7 @@ public enum MarkKind
     None,
     Wares,
     Market,
+    Seals,
 }
 
 // A mark on one particular stack, used when marks aren't remembered per item.
@@ -26,6 +27,7 @@ public sealed class CharacterMarks
 {
     public HashSet<uint> Wares { get; set; } = new();
     public HashSet<uint> Market { get; set; } = new();
+    public HashSet<uint> Seals { get; set; } = new();
 
     // Per-stack marks, keyed by "container:slot" of the real bag slot.
     public Dictionary<string, SlotMark> Slots { get; set; } = new();
@@ -69,7 +71,11 @@ public sealed class Configuration : IPluginConfiguration
     public void Migrate()
     {
         Marks ??= new();
-        foreach (var marks in Marks.Values) marks.Slots ??= new();
+        foreach (var marks in Marks.Values)
+        {
+            marks.Slots ??= new();
+            marks.Seals ??= new();
+        }
         SellButtonOffsets ??= new();
         Version = CurrentVersion;
     }

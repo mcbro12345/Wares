@@ -9,8 +9,8 @@ using Wares.Base;
 
 namespace Wares.Game;
 
-// Wares and Market marks for the logged-in character. An item holds at most
-// one mark: setting either kind removes the other.
+// Wares, Market and Seals marks for the logged-in character. An item holds at
+// most one mark: setting any kind removes the others.
 //
 // With "remember marks per item" on, a mark belongs to the item itself, so
 // every copy (and any copy picked up later) carries it. With it off, a mark
@@ -61,6 +61,7 @@ internal sealed unsafe class MarkStore : IDisposable
 
         if (marks.Wares.Contains(key)) return MarkKind.Wares;
         if (marks.Market.Contains(key)) return MarkKind.Market;
+        if (marks.Seals.Contains(key)) return MarkKind.Seals;
         return MarkKind.None;
     }
 
@@ -78,19 +79,21 @@ internal sealed unsafe class MarkStore : IDisposable
             }
             marks.Wares.Remove(key);
             marks.Market.Remove(key);
+            marks.Seals.Remove(key);
             if (kind == MarkKind.Wares) marks.Wares.Add(key);
             else if (kind == MarkKind.Market) marks.Market.Add(key);
+            else if (kind == MarkKind.Seals) marks.Seals.Add(key);
         }
         configuration.Save();
     }
 
-    public (int Wares, int Market) Counts()
+    public (int Wares, int Market, int Seals) Counts()
     {
         var marks = Current;
-        if (marks == null) return (0, 0);
-        if (PerItem) return (marks.Wares.Count, marks.Market.Count);
-        return (marks.Slots.Values.Count(mark => mark.Kind == MarkKind.Wares),
-            marks.Slots.Values.Count(mark => mark.Kind == MarkKind.Market));
+        if (marks == null) return (0, 0, 0);
+        if (PerItem) return (marks.Wares.Count, marks.Market.Count, marks.Seals.Count);
+        int Slots(MarkKind kind) => marks.Slots.Values.Count(mark => mark.Kind == kind);
+        return (Slots(MarkKind.Wares), Slots(MarkKind.Market), Slots(MarkKind.Seals));
     }
 
     public void ClearCharacter()
@@ -101,6 +104,7 @@ internal sealed unsafe class MarkStore : IDisposable
         {
             marks.Wares.Clear();
             marks.Market.Clear();
+            marks.Seals.Clear();
         }
         else
         {

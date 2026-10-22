@@ -17,7 +17,7 @@ namespace Wares.Game;
 // own item menu. Right-clicking one of several selected items opens a menu
 // holding only the Wares entries instead, since the game's entries (Discard,
 // Link...) act on one item, not the selection. Entries for a mark the item(s)
-// can't take are shown greyed out.
+// can't take are left out.
 internal sealed unsafe class ItemContextMenu : IDisposable
 {
     private const char PrefixGlyph = 'W';
@@ -123,35 +123,45 @@ internal sealed unsafe class ItemContextMenu : IDisposable
 
     private void AddSingleItemEntries(IMenuOpenedArgs args, Entry entry)
     {
-        if (entry.Mark == MarkKind.Wares)
-            Add(args, "Unmark Wares", true, () => marks.Set([(entry.Slot, entry.Key)], MarkKind.None));
-        else
-            Add(args, "Mark for Wares", entry.CanSell, () => marks.Set([(entry.Slot, entry.Key)], MarkKind.Wares));
+        AddMarkEntry(args, entry, MarkKind.Wares, "Wares", entry.CanSell);
+        AddMarkEntry(args, entry, MarkKind.Market, "Market", entry.CanList);
+        AddMarkEntry(args, entry, MarkKind.Seals, "Seals", entry.CanSeal);
+    }
 
-        if (entry.Mark == MarkKind.Market)
-            Add(args, "Unmark Market", true, () => marks.Set([(entry.Slot, entry.Key)], MarkKind.None));
-        else
-            Add(args, "Mark for Market", entry.CanList, () => marks.Set([(entry.Slot, entry.Key)], MarkKind.Market));
+    // "Unmark" while the item carries this mark, "Mark for" if it can take it, nothing otherwise.
+    private void AddMarkEntry(IMenuOpenedArgs args, Entry entry, MarkKind kind, string name, bool allowed)
+    {
+        if (entry.Mark == kind)
+            Add(args, $"Unmark {name}", () => marks.Set([(entry.Slot, entry.Key)], MarkKind.None));
+        else if (allowed)
+            Add(args, $"Mark for {name}", () => marks.Set([(entry.Slot, entry.Key)], kind));
     }
 
     private void OpenSelectionMenu(List<Entry> entries)
     {
         var sellable = entries.Where(entry => entry.CanSell).ToList();
         var listable = entries.Where(entry => entry.CanList).ToList();
+        var sealable = entries.Where(entry => entry.CanSeal).ToList();
         var marked = entries.Where(entry => entry.Mark != MarkKind.None).ToList();
         int total = entries.Count;
 
         selectionMenu ??= new NativeContextMenu();
         selectionMenu.Clear();
         // The menu lists the lowest DisplayPriority first, so the order below
-        // is passed negated: Wares, then Market, then Clear.
-        AddSelectionItem(BulkLabel("Wares", sellable.Count, total), sellable.Count > 0, 3,
-            () => MarkSelection(sellable, MarkKind.Wares));
-        AddSelectionItem(BulkLabel("Market", listable.Count, total), listable.Count > 0, 2,
-            () => MarkSelection(listable, MarkKind.Market));
+        // is passed negated: Wares, Market, Seals, then Clear. An entry is only
+        // listed if it applies to at least one of the selected items.
+        int listed = 0;
+        void AddSelectionItem(string name, int priority, Action onClick)
+        {
+            selectionMenu.AddItem(new ContextMenuItem { Name = name, OnClick = onClick, DisplayPriority = -priority });
+            listed++;
+        }
+        if (sellable.Count > 0) AddSelectionItem(BulkLabel("Wares", sellable.Count, total), 4, () => MarkSelection(sellable, MarkKind.Wares));
+        if (listable.Count > 0) AddSelectionItem(BulkLabel("Market", listable.Count, total), 3, () => MarkSelection(listable, MarkKind.Market));
+        if (sealable.Count > 0) AddSelectionItem(BulkLabel("Seals", sealable.Count, total), 2, () => MarkSelection(sealable, MarkKind.Seals));
         if (marked.Count > 0)
-            AddSelectionItem($"Clear Marks on {marked.Count} Item{(marked.Count == 1 ? "" : "s")}", true, 1,
-                () => MarkSelection(marked, MarkKind.None));
+            AddSelectionItem($"Clear Marks on {marked.Count} Item{(marked.Count == 1 ? "" : "s")}", 1, () => MarkSelection(marked, MarkKind.None));
+        if (listed == 0) return;
 
         // Other plugins add item entries (Search in Market Board, Vendor
         // Location...) to any menu opened over a hovered item. This menu is
@@ -165,15 +175,6 @@ internal sealed unsafe class ItemContextMenu : IDisposable
         selectionMenu.Open(owner != null ? owner->Id : 0u);
     }
 
-    private void AddSelectionItem(string name, bool enabled, int priority, Action onClick)
-        => selectionMenu!.AddItem(new ContextMenuItem
-        {
-            Name = name,
-            IsEnabled = enabled,
-            OnClick = onClick,
-            DisplayPriority = -priority,
-        });
-
     private void MarkSelection(IEnumerable<Entry> entries, MarkKind kind)
     {
         marks.Set(entries.Select(entry => (entry.Slot, entry.Key)), kind);
@@ -183,12 +184,11 @@ internal sealed unsafe class ItemContextMenu : IDisposable
     private static string BulkLabel(string kind, int eligible, int total)
         => eligible == total ? $"Mark {total} Items for {kind}" : $"Mark {eligible} of {total} Items for {kind}";
 
-    private static void Add(IMenuOpenedArgs args, string name, bool enabled, Action onClicked)
+    private static void Add(IMenuOpenedArgs args, string name, Action onClicked)
         => args.AddMenuItem(new MenuItem
         {
             Name = name,
             PrefixChar = PrefixGlyph,
-            IsEnabled = enabled,
             OnClicked = _ => onClicked(),
         });
 
@@ -196,8 +196,8 @@ internal sealed unsafe class ItemContextMenu : IDisposable
     {
         var item = PlayerBags.GetItem(slot);
         if (item == null) return default;
-        return new Entry(slot, ItemRules.MarkKey(item), marks.Get(slot, item), ItemRules.CanSellToVendor(item), ItemRules.CanListOnMarket(item));
+        return new Entry(slot, ItemRules.MarkKey(item), marks.Get(slot, item), ItemRules.CanSellToVendor(item), ItemRules.CanListOnMarket(item), ItemRules.CanSellForSeals(item));
     }
 
-    private readonly record struct Entry(SlotRef Slot, uint Key, MarkKind Mark, bool CanSell, bool CanList);
+    private readonly record struct Entry(SlotRef Slot, uint Key, MarkKind Mark, bool CanSell, bool CanList, bool CanSeal);
 }

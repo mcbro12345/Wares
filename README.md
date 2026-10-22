@@ -1,18 +1,18 @@
 # Wares
 
-A Dalamud plugin for FFXIV that lets you mark inventory items as **Wares** (vendor junk) or **Market** (to list on the market board), and sell every Wares-marked item in one click.
+A Dalamud plugin for FFXIV that lets you mark inventory items as **Wares** (vendor junk), **Market** (to list on the market board) or **Seals** (to turn in to your Grand Company), and sell every Wares-marked item in one click.
 
 ## Features
 
-- **Native badges.** Wares-marked items show a gil coin in the corner of their inventory cell; Market-marked items show an **M**.
-- **Only valid marks.** An item that can't be sold to a vendor can't be marked for Wares, and one that can't go on the market board can't be marked for Market. The menu entry is greyed out instead.
-- **One mark per item.** Marking an item for Wares removes its Market mark and vice versa.
+- **Native badges.** Wares-marked items show a gil coin in the corner of their inventory cell, Market-marked items show an **M** and Seals-marked items show an **S**.
+- **Only valid marks.** An item that can't be sold to a vendor can't be marked for Wares, one that can't go on the market board can't be marked for Market, and only gear the Grand Company takes in Expert Delivery can be marked for Seals. A mark an item can't take doesn't appear in its menu at all.
+- **One mark per item.** Marking an item removes any other mark it had.
 - **Ctrl+click multi-select.** Ctrl+left-click cells to select several items (they light up like a hovered cell), then right-click one of them to mark, re-mark or clear them all at once. Items that can't take a mark are skipped. Clicking anywhere else clears the selection, like File Explorer.
 - **Sell Wares button.** While you're talking to a vendor (or have a retainer's inventory open), a native **Sell Wares (N)** button appears in the inventory. It sells every Wares-marked item one by one and answers the game's confirmation prompts (unique, untradable, HQ, melded items) for you. Click it again to stop.
 - **Movable button.** Settings has an X / Y drag control for each inventory layout to line the button up, live, with a preview toggle so you can do it away from a vendor.
 - Works with the normal, larger and "open all bags" inventory layouts, including sorted inventories. Key items and crystals are never touched.
 
-Marks are saved per character and apply to the stack you marked: they follow it when you move it, and are gone once it's sold or used up. To mark an item, right-click it and choose **Mark for Wares** / **Mark for Market** (or **Unmark ...**). Turn on **Remember marks for every copy of an item** in the settings to have a mark cover every copy of that item (NQ and HQ separately), including ones you pick up later.
+Marks are saved per character and apply to the stack you marked: they follow it when you move it, and are gone once it's sold or used up. To mark an item, right-click it and choose **Mark for Wares** / **Mark for Market** / **Mark for Seals** (or **Unmark ...**). Turn on **Remember marks for every copy of an item** in the settings to have a mark cover every copy of that item (NQ and HQ separately), including ones you pick up later.
 
 ## Commands
 

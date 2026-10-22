@@ -15,7 +15,7 @@ using GameFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework
 
 namespace Wares.UI;
 
-// Draws the Wares (gil) and Market (M) badges on bag cells, and the hover-style
+// Draws the Wares (gil), Market (M) and Seals (S) badges on bag cells, and the hover-style
 // highlight on multi-selected cells, as native nodes inside each cell.
 internal sealed unsafe class InventoryOverlay : IDisposable
 {
@@ -25,6 +25,8 @@ internal sealed unsafe class InventoryOverlay : IDisposable
     public static readonly Vector4 GilOutline = new(0.4f, 0.26f, 0.0f, 1.0f);
     public static readonly Vector4 MarketColor = new(1.0f, 0.84f, 0.35f, 1.0f);
     public static readonly Vector4 MarketOutline = new(0.35f, 0.18f, 0.0f, 1.0f);
+    public static readonly Vector4 SealsColor = new(0.62f, 0.86f, 1.0f, 1.0f);
+    public static readonly Vector4 SealsOutline = new(0.05f, 0.2f, 0.4f, 1.0f);
 
     private readonly Configuration configuration;
     private readonly MarkStore marks;
@@ -173,6 +175,7 @@ internal sealed unsafe class InventoryOverlay : IDisposable
         private readonly ImageNode highlight;
         private readonly TextNode gilBadge;
         private readonly TextNode marketBadge;
+        private readonly TextNode sealsBadge;
         private readonly AtkComponentIcon* icon;
 
         public CellOverlay(AtkComponentNode* slotNode)
@@ -210,6 +213,10 @@ internal sealed unsafe class InventoryOverlay : IDisposable
             marketBadge = CreateBadge("M", MarketColor, MarketOutline);
             marketBadge.Position = badgePosition;
             marketBadge.AttachNode(badgeParent);
+
+            sealsBadge = CreateBadge("S", SealsColor, SealsOutline);
+            sealsBadge.Position = badgePosition;
+            sealsBadge.AttachNode(badgeParent);
         }
 
         public MarkKind Kind { get; private set; }
@@ -240,6 +247,7 @@ internal sealed unsafe class InventoryOverlay : IDisposable
             highlight.IsVisible = selected;
             gilBadge.IsVisible = kind == MarkKind.Wares;
             marketBadge.IsVisible = kind == MarkKind.Market;
+            sealsBadge.IsVisible = kind == MarkKind.Seals;
         }
 
         public void Dispose()
@@ -247,6 +255,7 @@ internal sealed unsafe class InventoryOverlay : IDisposable
             highlight.Dispose();
             gilBadge.Dispose();
             marketBadge.Dispose();
+            sealsBadge.Dispose();
         }
     }
 }
