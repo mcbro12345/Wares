@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Game.Gui.ContextMenu;
+using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Hooking;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using KamiToolKit.ContextMenu;
+using Lumina.Text.ReadOnly;
 
 using Wares.Base;
 
@@ -20,8 +23,6 @@ namespace Wares.Game;
 // can't take are left out.
 internal sealed unsafe class ItemContextMenu : IDisposable
 {
-    private const char PrefixGlyph = 'W';
-
     private readonly MarkStore marks;
     private readonly SlotSelection selection;
     // The game's "open the item menu for this slot" call. For a multi-selection
@@ -132,9 +133,9 @@ internal sealed unsafe class ItemContextMenu : IDisposable
     private void AddMarkEntry(IMenuOpenedArgs args, Entry entry, MarkKind kind, string name, bool allowed)
     {
         if (entry.Mark == kind)
-            Add(args, $"Unmark {name}", () => marks.Set([(entry.Slot, entry.Key)], MarkKind.None));
+            Add(args, MarkIcons.Label(kind, $"Unmark {name}"), () => marks.Set([(entry.Slot, entry.Key)], MarkKind.None));
         else if (allowed)
-            Add(args, $"Mark for {name}", () => marks.Set([(entry.Slot, entry.Key)], kind));
+            Add(args, MarkIcons.Label(kind, $"Mark for {name}"), () => marks.Set([(entry.Slot, entry.Key)], kind));
     }
 
     private void OpenSelectionMenu(List<Entry> entries)
@@ -151,16 +152,16 @@ internal sealed unsafe class ItemContextMenu : IDisposable
         // is passed negated: Wares, Market, Seals, then Clear. An entry is only
         // listed if it applies to at least one of the selected items.
         int listed = 0;
-        void AddSelectionItem(string name, int priority, Action onClick)
+        void AddSelectionItem(SeString name, int priority, Action onClick)
         {
-            selectionMenu.AddItem(new ContextMenuItem { Name = name, OnClick = onClick, DisplayPriority = -priority });
+            selectionMenu.AddItem(new ContextMenuItem { Name = new ReadOnlySeString(name.Encode()), OnClick = onClick, DisplayPriority = -priority });
             listed++;
         }
-        if (sellable.Count > 0) AddSelectionItem(BulkLabel("Wares", sellable.Count, total), 4, () => MarkSelection(sellable, MarkKind.Wares));
-        if (listable.Count > 0) AddSelectionItem(BulkLabel("Market", listable.Count, total), 3, () => MarkSelection(listable, MarkKind.Market));
-        if (sealable.Count > 0) AddSelectionItem(BulkLabel("Seals", sealable.Count, total), 2, () => MarkSelection(sealable, MarkKind.Seals));
+        if (sellable.Count > 0) AddSelectionItem(MarkIcons.Label(MarkKind.Wares, BulkLabel("Wares", sellable.Count, total)), 4, () => MarkSelection(sellable, MarkKind.Wares));
+        if (listable.Count > 0) AddSelectionItem(MarkIcons.Label(MarkKind.Market, BulkLabel("Market", listable.Count, total)), 3, () => MarkSelection(listable, MarkKind.Market));
+        if (sealable.Count > 0) AddSelectionItem(MarkIcons.Label(MarkKind.Seals, BulkLabel("Seals", sealable.Count, total)), 2, () => MarkSelection(sealable, MarkKind.Seals));
         if (marked.Count > 0)
-            AddSelectionItem($"Clear Marks on {marked.Count} Item{(marked.Count == 1 ? "" : "s")}", 1, () => MarkSelection(marked, MarkKind.None));
+            AddSelectionItem(new SeString(new TextPayload($"Clear Marks on {marked.Count} Item{(marked.Count == 1 ? "" : "s")}")), 1, () => MarkSelection(marked, MarkKind.None));
         if (listed == 0) return;
 
         // Other plugins add item entries (Search in Market Board, Vendor
@@ -184,11 +185,12 @@ internal sealed unsafe class ItemContextMenu : IDisposable
     private static string BulkLabel(string kind, int eligible, int total)
         => eligible == total ? $"Mark {total} Items for {kind}" : $"Mark {eligible} of {total} Items for {kind}";
 
-    private static void Add(IMenuOpenedArgs args, string name, Action onClicked)
+    // The icon leads the entry's text, so the plugin's own boxed-letter prefix is left off.
+    private static void Add(IMenuOpenedArgs args, SeString name, Action onClicked)
         => args.AddMenuItem(new MenuItem
         {
             Name = name,
-            PrefixChar = PrefixGlyph,
+            UseDefaultPrefix = false,
             OnClicked = _ => onClicked(),
         });
 

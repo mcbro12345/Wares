@@ -4,7 +4,7 @@ A Dalamud plugin for FFXIV that lets you mark inventory items as **Wares** (vend
 
 ## Features
 
-- **Native badges.** Wares-marked items show a gil coin in the corner of their inventory cell, Market-marked items show an **M** and Seals-marked items show an **S**.
+- **Native badges.** Wares-marked items show the gil symbol in the corner of their inventory cell, Market-marked items show an **M** and Seals-marked items show your Grand Company's seal. The mark entries in the right-click menus carry the same icons.
 - **Only valid marks.** An item that can't be sold to a vendor can't be marked for Wares, one that can't go on the market board can't be marked for Market, and only gear the Grand Company takes in Expert Delivery can be marked for Seals. A mark an item can't take doesn't appear in its menu at all.
 - **One mark per item.** Marking an item removes any other mark it had.
 - **Ctrl+click multi-select.** Ctrl+left-click cells to select several items (they light up like a hovered cell), then right-click one of them to mark, re-mark or clear them all at once. Items that can't take a mark are skipped. Clicking anywhere else clears the selection, like File Explorer.

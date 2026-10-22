@@ -54,13 +54,23 @@ internal static unsafe class ItemRules
             && item->GetGlamourId() == 0;
     }
 
-    // Expert Delivery takes gear that can be discarded and pays seals by item level; the game's reward table has a
-    // row per item level, so an item level with no seals in it can't be turned in either.
+    // Expert Delivery only takes gear of green, blue or pink rarity that has a job, can be desynthesized and has a
+    // vendor price (the rules ECommons and SimpleTweaks use), and pays seals by item level: the game's reward table
+    // has a row per item level, so an item level with no seals in it can't be turned in either.
+    private const byte RarityGreen = 2;
+    private const byte RarityBlue = 3;
+    private const byte RarityPink = 7;
+
     public static bool CanSellForSeals(InventoryItem* item)
     {
         if (Row(item) is not { } row) return false;
         return row.EquipSlotCategory.RowId != 0
+            && row.ClassJobCategory.RowId != 0
+            && row.Rarity is RarityGreen or RarityBlue or RarityPink
+            && row.Desynth > 0
+            && row.PriceLow > 0
             && !row.IsIndisposable
+            && !item->IsCollectable()
             && SealRewards.GetRowOrDefault(row.LevelItem.RowId)?.SealsExpertDelivery > 0;
     }
 

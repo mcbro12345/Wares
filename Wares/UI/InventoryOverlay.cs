@@ -15,7 +15,7 @@ using GameFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework
 
 namespace Wares.UI;
 
-// Draws the Wares (gil), Market (M) and Seals (S) badges on bag cells, and the hover-style
+// Draws the Wares (gil), Market (M) and Seals (seal icon) badges on bag cells, and the hover-style
 // highlight on multi-selected cells, as native nodes inside each cell.
 internal sealed unsafe class InventoryOverlay : IDisposable
 {
@@ -25,8 +25,6 @@ internal sealed unsafe class InventoryOverlay : IDisposable
     public static readonly Vector4 GilOutline = new(0.4f, 0.26f, 0.0f, 1.0f);
     public static readonly Vector4 MarketColor = new(1.0f, 0.84f, 0.35f, 1.0f);
     public static readonly Vector4 MarketOutline = new(0.35f, 0.18f, 0.0f, 1.0f);
-    public static readonly Vector4 SealsColor = new(0.62f, 0.86f, 1.0f, 1.0f);
-    public static readonly Vector4 SealsOutline = new(0.05f, 0.2f, 0.4f, 1.0f);
 
     private readonly Configuration configuration;
     private readonly MarkStore marks;
@@ -77,6 +75,18 @@ internal sealed unsafe class InventoryOverlay : IDisposable
         TextColor = color,
         TextOutlineColor = outline,
         AlignmentType = AlignmentType.Center,
+        IsVisible = false,
+    };
+
+    // The seal badge is the seal currency's icon, a little larger than the
+    // text badges and nudged so it sits in the same corner.
+    public static readonly Vector2 SealBadgeOffset = new(-2.0f, -2.0f);
+
+    public static IconImageNode CreateSealBadge() => new()
+    {
+        IconId = MarkIcons.SealIconId,
+        Size = new Vector2(20.0f),
+        FitTexture = true,
         IsVisible = false,
     };
 
@@ -175,7 +185,7 @@ internal sealed unsafe class InventoryOverlay : IDisposable
         private readonly ImageNode highlight;
         private readonly TextNode gilBadge;
         private readonly TextNode marketBadge;
-        private readonly TextNode sealsBadge;
+        private readonly IconImageNode sealsBadge;
         private readonly AtkComponentIcon* icon;
 
         public CellOverlay(AtkComponentNode* slotNode)
@@ -214,8 +224,8 @@ internal sealed unsafe class InventoryOverlay : IDisposable
             marketBadge.Position = badgePosition;
             marketBadge.AttachNode(badgeParent);
 
-            sealsBadge = CreateBadge("S", SealsColor, SealsOutline);
-            sealsBadge.Position = badgePosition;
+            sealsBadge = CreateSealBadge();
+            sealsBadge.Position = badgePosition + SealBadgeOffset;
             sealsBadge.AttachNode(badgeParent);
         }
 
@@ -248,6 +258,7 @@ internal sealed unsafe class InventoryOverlay : IDisposable
             gilBadge.IsVisible = kind == MarkKind.Wares;
             marketBadge.IsVisible = kind == MarkKind.Market;
             sealsBadge.IsVisible = kind == MarkKind.Seals;
+            if (sealsBadge.IsVisible) sealsBadge.IconId = MarkIcons.SealIconId;
         }
 
         public void Dispose()
