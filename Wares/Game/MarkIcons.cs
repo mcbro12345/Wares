@@ -42,7 +42,24 @@ internal static unsafe class MarkIcons
         _ => null,
     };
 
-    // A menu label led by the mark's icon.
+    // An entry in the game's own item menu must have a prefix glyph (Dalamud
+    // puts its own boxed "D" on any that hasn't). Wares and Market have glyphs
+    // of their own; the seal emblem isn't a font glyph, so a Seals entry gets a
+    // blank prefix and keeps the emblem at the start of its text.
+    private const SeIconChar BlankPrefix = (SeIconChar)' ';
+
+    public static SeIconChar MenuPrefix(MarkKind kind) => kind switch
+    {
+        MarkKind.Wares => SeIconChar.Gil,
+        MarkKind.Market => SeIconChar.BoxedLetterM,
+        _ => BlankPrefix,
+    };
+
+    public static SeString MenuText(MarkKind kind, string text)
+        => kind == MarkKind.Seals ? Label(kind, text) : new SeStringBuilder().AddText(text).Build();
+
+    // A label led by the mark's icon, for the multi-select menu, which has no
+    // prefix of its own.
     public static SeString Label(MarkKind kind, string text)
     {
         var builder = new SeStringBuilder();

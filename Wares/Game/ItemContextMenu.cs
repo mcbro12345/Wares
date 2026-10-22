@@ -133,9 +133,9 @@ internal sealed unsafe class ItemContextMenu : IDisposable
     private void AddMarkEntry(IMenuOpenedArgs args, Entry entry, MarkKind kind, string name, bool allowed)
     {
         if (entry.Mark == kind)
-            Add(args, MarkIcons.Label(kind, $"Unmark {name}"), () => marks.Set([(entry.Slot, entry.Key)], MarkKind.None));
+            Add(args, kind, $"Unmark {name}", () => marks.Set([(entry.Slot, entry.Key)], MarkKind.None));
         else if (allowed)
-            Add(args, MarkIcons.Label(kind, $"Mark for {name}"), () => marks.Set([(entry.Slot, entry.Key)], kind));
+            Add(args, kind, $"Mark for {name}", () => marks.Set([(entry.Slot, entry.Key)], kind));
     }
 
     private void OpenSelectionMenu(List<Entry> entries)
@@ -185,12 +185,11 @@ internal sealed unsafe class ItemContextMenu : IDisposable
     private static string BulkLabel(string kind, int eligible, int total)
         => eligible == total ? $"Mark {total} Items for {kind}" : $"Mark {eligible} of {total} Items for {kind}";
 
-    // The icon leads the entry's text, so the plugin's own boxed-letter prefix is left off.
-    private static void Add(IMenuOpenedArgs args, SeString name, Action onClicked)
+    private static void Add(IMenuOpenedArgs args, MarkKind kind, string text, Action onClicked)
         => args.AddMenuItem(new MenuItem
         {
-            Name = name,
-            UseDefaultPrefix = false,
+            Name = MarkIcons.MenuText(kind, text),
+            Prefix = MarkIcons.MenuPrefix(kind),
             OnClicked = _ => onClicked(),
         });
 

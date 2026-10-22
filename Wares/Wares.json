@@ -2,7 +2,7 @@
   "Author": "mcbro",
   "Name": "Wares",
   "InternalName": "Wares",
-  "AssemblyVersion": "1.1.1.0",
+  "AssemblyVersion": "1.1.2.0",
   "Description": "Mark inventory items as vendor wares, market listings or Grand Company seals with native badges, multi-select with Ctrl+click, and sell every marked ware in one click at vendors and retainers.",
   "ApplicableVersion": "any",
   "Tags": ["inventory", "vendor", "sell", "market", "junk"],
